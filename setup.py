@@ -9,6 +9,7 @@ try:
 except ImportError:
     sys.stderr.write("Error: pybind11 is required to build the C++ extension. Install it via 'pip install pybind11'.\n")
     sys.exit(1)
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Define extension module
 module = Extension(
@@ -20,7 +21,7 @@ module = Extension(
     ],
     include_dirs=[
         pybind11_include,
-        os.path.join("bindings", "includes"),
+        os.path.join(here, "bindings", "includes"),
     ],
     language="c++",
     extra_compile_args=["-O3", "-std=c++20"],
@@ -53,6 +54,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
+    include_package_data=True,
     zip_safe=False,
     )
 

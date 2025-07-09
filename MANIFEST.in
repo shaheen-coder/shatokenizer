@@ -1,0 +1,3 @@
+# MANIFEST.in
+# Include everything under bindings/ into the source distribution
+recursive-include bindings *

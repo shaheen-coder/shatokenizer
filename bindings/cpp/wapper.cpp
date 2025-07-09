@@ -1,7 +1,7 @@
 // shatokenizer_pybind.cpp
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "../includes/tokenizer.hpp"
+#include "tokenizer.hpp"
  
 namespace py = pybind11;
 

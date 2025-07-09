@@ -11,8 +11,8 @@
 #include <sstream>
 #include <algorithm>
 
-#include "../includes/utils.hpp"
-#include "../includes/tokenizer.hpp"
+#include "utils.hpp"
+#include "tokenizer.hpp"
 
 
 // load text from file

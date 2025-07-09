@@ -2,8 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/shatokenizer.svg)](https://badge.fury.io/py/shatokenizer)
 [![Python versions](https://img.shields.io/pypi/pyversions/shatokenizer.svg)](https://pypi.org/project/shatokenizer/)
-[![License](https://img.shields.io/github/license/yourusername/shatokenizer.svg)](LICENSE)
-[![Build Status](https://github.com/yourusername/shatokenizer/workflows/CI/badge.svg)](https://github.com/yourusername/shatokenizer/actions)
+[![License](https://img.shields.io/github/license/shaheen-coder/shatokenizer.svg)](LICENSE)
 [![PyPI downloads](https://img.shields.io/pypi/dm/shatokenizer.svg)](https://pypi.org/project/shatokenizer/)
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://isocpp.org/)
 [![pybind11](https://img.shields.io/badge/pybind11-2.11%2B-blue.svg)](https://pybind11.readthedocs.io/)
