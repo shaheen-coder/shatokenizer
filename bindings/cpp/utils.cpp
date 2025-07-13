@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
 #include <sstream>
+#include <string>
 
 std::vector<std::string> split_words(const std::string& str){
     std::vector<std::string> words;
@@ -18,37 +19,6 @@ std::vector<std::string> split_char(const std::string& word){
         chrs.push_back(std::to_string(chr));
     }
     return chrs;
-}
-std::pair<std::string, std::string> get_max_pair(
-    const std::unordered_map<std::pair<std::string, std::string>, int, PairHash>& pairs
-) {
-    int max_freq = -1;
-    std::pair<std::string, std::string> best_pair;
-
-    for (const auto& [pair, freq] : pairs) {
-        if (freq > max_freq) {
-            max_freq = freq;
-            best_pair = pair;
-        }
-    }
-
-    return best_pair;
-}
-
-std::pair<std::string, std::string> get_min_pair(
-    const std::unordered_map<std::pair<std::string, std::string>, int, PairHash>& pairs
-) {
-    int min_freq = std::numeric_limits<int>::max();
-    std::pair<std::string, std::string> best_pair;
-
-    for (const auto& [pair, freq] : pairs) {
-        if (freq < min_freq) {
-            min_freq = freq;
-            best_pair = pair;
-        }
-    }
-
-    return best_pair;
 }
 
 

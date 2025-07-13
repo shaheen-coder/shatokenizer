@@ -1,4 +1,4 @@
-# ShaTokenizer
+# ShaTokenizer 0.1.1
 
 [![PyPI version](https://badge.fury.io/py/shatokenizer.svg)](https://badge.fury.io/py/shatokenizer)
 [![Python versions](https://img.shields.io/pypi/pyversions/shatokenizer.svg)](https://pypi.org/project/shatokenizer/)
@@ -18,6 +18,72 @@ A high-performance BPE (Byte Pair Encoding) tokenizer with Python bindings and a
 - 📊 **BPE Algorithm**: Efficient subword tokenization
 - 🎯 **Cross-Platform**: Works on Windows, macOS, and Linux
 
+## ⏱️ Tokenization Time Benchmark
+
+### 🔄 Version Comparison: `v0.1.1` vs `v0.1.0`
+
+Significant improvements in tokenization speed have been made in version **0.1.1** compared to the initial release **0.1.0**.
+
+| Tokens Processed | Time (v0.1.0) | Time (v0.1.1) | Speedup |
+| ---------------- | ------------- | ------------- | ------- |
+| 0                | 84,157 µs     | 5,502 µs      | \~15×   |
+| 100              | 6,977,301 µs  | 642,335 µs    | \~10.9× |
+| 200              | 14,437,683 µs | 1,370,924 µs  | \~10.5× |
+| 300              | 20,902,067 µs | 2,154,547 µs  | \~9.7×  |
+| 400              | 26,554,987 µs | 2,967,434 µs  | \~8.9×  |
+| 500              | 32,350,267 µs | 3,798,688 µs  | \~8.5×  |
+| 600              | 38,075,928 µs | 4,630,268 µs  | \~8.2×  |
+| 700              | 43,831,217 µs | 5,471,428 µs  | \~8.0×  |
+| 800              | 49,559,857 µs | 6,316,320 µs  | \~7.8×  |
+| 900              | 56,149,850 µs | 7,166,352 µs  | \~7.8×  |
+| 1000             | 62,877,499 µs | *(Pending)*   | *(N/A)* |
+
+⚡ **Overall**, version `0.1.1` is **7–15× faster** across the board due to internal optimizations and improved data structures.
+
+> 💡 *Benchmark run with vocab size of 1000 tokens. Measurements are approximate and may vary slightly based on system specs.*
+
+---
+
+### 📈 Visual Benchmark
+
+You can visualize the performance improvements in the chart below:
+
+#### Time Comparison (Lower is Better)
+
+!\[Tokenization Time Comparison]\([https://quickchart.io/chart?c={](https://quickchart.io/chart?c={)
+"type":"line",
+"data":{
+"labels":\["0","100","200","300","400","500","600","700","800","900"],
+"datasets":\[
+{
+"label":"v0.1.0",
+"data":\[84157,6977301,14437683,20902067,26554987,32350267,38075928,43831217,49559857,56149850],
+"borderColor":"#e74c3c",
+"fill"\:false
+},
+{
+"label":"v0.1.1",
+"data":\[5502,642335,1370924,2154547,2967434,3798688,4630268,5471428,6316320,7166352],
+"borderColor":"#2ecc71",
+"fill"\:false
+}
+]
+},
+"options":{
+"title":{
+"display"\:true,
+"text":"ShaTokenizer Tokenization Time Benchmark (µs)"
+},
+"scales":{
+"yAxes":\[{"scaleLabel":{"display"\:true,"labelString":"Time (µs)"}}],
+"xAxes":\[{"scaleLabel":{"display"\:true,"labelString":"Tokens Processed"}}]
+}
+}
+})
+
+> 📊 Powered by [QuickChart.io](https://quickchart.io) for inline GitHub chart rendering.
+
+---
 ## Installation
 
 ### From PyPI

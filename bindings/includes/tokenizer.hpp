@@ -15,14 +15,14 @@ class ShaTokenizer{
         std::vector<std::string> sentence_list;
         // uitls functions 
         void load_text();
-        std::unordered_map<std::pair<std::string, std::string>, int, PairHash> get_stats(const std::unordered_map<std::string,int>& vocab);
-        std::unordered_map<std::string,int> merege_vocab(const std::pair<std::string,std::string>& pair,const std::unordered_map<std::string,int>& vocab);
     public:
         std::size_t vocab_size;
         std::unordered_map<std::string,int> vocab;
-        std::unordered_map<std::pair<std::string,std::string>,int,PairHash> bpe_rank;
-        std::map<std::string,int> token_to_id;
-        std::map<int,std::string> id_to_token;
+        std::unordered_map<std::pair<int, int>, int, IntPairHash> bpe_rank; 
+        std::unordered_map<std::pair<int, int>, int, IntPairHash> merge_map;
+
+        std::unordered_map<std::string,int> token_to_id;
+        std::vector<std::string> id_to_token;
         
         // speical tokens 
         const std::string pad_token  = "<pad>";
@@ -46,7 +46,7 @@ class ShaTokenizer{
 
         // public func
         void train(std::string fname,int vocabSize);
-        std::vector<std::string> encode_word(const std::string& word);      
+        std::vector<int> encode_word(const std::string& word);      
         std::vector<int> encode(const std::string& str);
         std::string decode(const std::vector<int>& ids);
 

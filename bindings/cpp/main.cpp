@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <limits>
@@ -32,201 +33,194 @@ void ShaTokenizer::load_text(){
     File.close();
 }
 
-std::unordered_map<std::pair<std::string, std::string>, int, PairHash> ShaTokenizer::get_stats(const std::unordered_map<std::string,int>& vocab){
-    std::unordered_map<std::pair<std::string, std::string>, int, PairHash> paris;
 
-    for(const auto& [word,freq] : vocab){
-        auto tokens = split_words(word);
-        for(size_t i=0; i+1 < tokens.size(); ++i){
-            paris[{tokens[i],tokens[i+1]}] += freq;
-        }
+std::vector<int> ShaTokenizer::encode_word(const std::string& word) {
+    std::vector<int> tokens;
+    tokens.reserve(word.size() + 1);
+    for (char c : word) {
+        std::string s(1, c);
+        tokens.push_back(token_to_id.contains(s) ? token_to_id[s] : unk_token_id);
     }
-
-    return paris;
-}
-
-std::unordered_map<std::string,int> ShaTokenizer::merege_vocab(const std::pair<std::string,std::string>& pair, const std::unordered_map<std::string,int>& vocab) {
-    std::unordered_map<std::string,int> new_vocab;
-    for (const auto& [key, freq] : vocab) {
-        // Split key into subwords
-        std::vector<std::string> subwords;
-        std::istringstream iss(key);
-        std::string token;
-        while (iss >> token) {
-            subwords.push_back(token);
-        }
-        // Merge consecutive subwords matching the pair
-        std::vector<std::string> new_subwords;
-        size_t i = 0;
-        while (i < subwords.size()) {
-            if (i + 1 < subwords.size() && subwords[i] == pair.first && subwords[i + 1] == pair.second) {
-                new_subwords.push_back(pair.first + pair.second);
-                i += 2;
-            } else {
-                new_subwords.push_back(subwords[i]);
-                i++;
-            }
-        }
-        // Join subwords back into a string
-        std::ostringstream oss;
-        for (size_t j = 0; j < new_subwords.size(); ++j) {
-            if (j > 0) oss << " ";
-            oss << new_subwords[j];
-        }
-        std::string new_key = oss.str();
-        new_vocab[new_key] = freq;
-    }
-    return new_vocab;
-}
-
-
-
-std::vector<std::string> ShaTokenizer::encode_word(const std::string& input) {
-    std::vector<std::string> symbols;
-    symbols.reserve(input.size() + 1);
-    for (char c : input) {
-        symbols.emplace_back(1, c);
-    }
-    symbols.emplace_back("<w>");
-
-    std::unordered_map<std::string,int> current_vocab;
-    current_vocab.reserve(1);
-    current_vocab[join_tokens(symbols)] = 1;
-
-    std::unordered_map<std::pair<std::string,std::string>,int,PairHash> pairs;
-    pairs.reserve(symbols.size());
+    tokens.push_back(token_to_id["<w>"]);
 
     while (true) {
-        pairs = get_stats(current_vocab);
+        std::vector<std::pair<int, int>> pairs;
+        pairs.reserve(tokens.size() - 1);
+        for (size_t j = 0; j + 1 < tokens.size(); ++j) {
+            pairs.emplace_back(tokens[j], tokens[j + 1]);
+        }
+        if (pairs.empty()) break;
 
-        auto best = pairs.end();
+        std::pair<int, int> best_pair;
         int best_rank = std::numeric_limits<int>::max();
-
-        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
-            auto rank_it = bpe_rank.find(it->first);
-            if (rank_it != bpe_rank.end() && rank_it->second < best_rank) {
-                best = it;
-                best_rank = rank_it->second;
+        for (const auto& p : pairs) {
+            if (auto it = bpe_rank.find(p); it != bpe_rank.end() && it->second < best_rank) {
+                best_pair = p;
+                best_rank = it->second;
             }
         }
+        if (best_rank == std::numeric_limits<int>::max()) break;
 
-        if (best == pairs.end()) {
-            break;
-        }
-
-        current_vocab = merege_vocab(best->first, current_vocab);
-
-        const std::string& merged = current_vocab.begin()->first;
-        symbols.clear();
-        {
-            std::istringstream iss(merged);
-            std::string tok;
-            while (iss >> tok) {
-                symbols.emplace_back(std::move(tok));
-            }
-        }
-    }
-
-    return symbols;
-}
-std::vector<int> ShaTokenizer::encode(const std::string& str){
-    std::vector<int> tokens;
-    tokens.push_back(start_token_id);
-    for(const auto& word : split_words(str)){
-        auto word_encoded = encode_word(word);
-        for(const auto& token : word_encoded){
-            std::string temp = token;
-            remove_w_tag(temp);
-            auto it = token_to_id.find(temp);
-            if (it == token_to_id.end()) {
-                tokens.push_back(unk_token_id);
-                std::cerr << "Unknown token “" << temp << "” in encode(); assigning <unk>=0\n";
-                tokens.push_back(0);
+        int new_id = merge_map[best_pair];
+        std::vector<int> new_tokens;
+        new_tokens.reserve(tokens.size());
+        size_t k = 0;
+        while (k < tokens.size()) {
+            if (k + 1 < tokens.size() && tokens[k] == best_pair.first && tokens[k + 1] == best_pair.second) {
+                new_tokens.push_back(new_id);
+                k += 2;
             } else {
-                tokens.push_back(it->second);
+                new_tokens.push_back(tokens[k]);
+                k++;
             }
         }
+        tokens = std::move(new_tokens);
     }
-    tokens.push_back(end_token_id); 
+
+    if (!tokens.empty() && tokens.back() == token_to_id["<w>"]) {
+        tokens.pop_back();
+    }
     return tokens;
 }
 
-std::string ShaTokenizer::decode(const std::vector<int>& ids){
+std::vector<int> ShaTokenizer::encode(const std::string& str) {
+    std::vector<int> tokens;
+    tokens.reserve(str.size()); // Rough estimate
+    tokens.push_back(start_token_id);
+    for (const auto& word : split_words(str)) {
+        auto word_tokens = encode_word(word);
+        tokens.insert(tokens.end(), word_tokens.begin(), word_tokens.end());
+    }
+    tokens.push_back(end_token_id);
+    return tokens;
+}
+
+std::string ShaTokenizer::decode(const std::vector<int>& ids) {
     std::ostringstream oss;
     for (int id : ids) {
         if (id == pad_token_id || id == start_token_id || id == end_token_id) continue;
-        auto it = id_to_token.find(id);
-        if (it != id_to_token.end()) {
-            oss << it->second;
-            oss << " ";
+        if (id >= 0 && static_cast<size_t>(id) < id_to_token.size()) {
+            oss << id_to_token[id] << " ";
         } else {
-            oss << unk_token;
-            oss << " ";  // fallback
+            oss << unk_token << " "; // fallback
         }
     }
     return oss.str();
 }
 
-
-
-void ShaTokenizer::train(std::string fname,int vocabSize){
+void ShaTokenizer::train(std::string fname, int vocabSize) {
     filename = fname;
     vocab_size = vocabSize;
     load_text();
-    
-    std::unordered_map<std::string,int> word_freq;
-    
-    // creating inital vocab
-    for(const auto& line : sentence_list){
-        for(const auto& words : split_words(line)){
-            std::string temp;
-            for(char chr : words){
-                temp.append(1, chr);
-                temp.append(" ");
 
+    // Initialize initial tokens
+    std::unordered_set<std::string> initial_tokens{"<w>"};
+    for (const auto& line : sentence_list) {
+        for (const auto& word : split_words(line)) {
+            for (char c : word) {
+                initial_tokens.insert(std::string(1, c));
             }
-            temp += "<w>";
-            word_freq[temp]++;
         }
     }
-    for(std::size_t i = 0; i <= vocab_size; i++){
-        auto paris = get_stats(word_freq);
-        auto best = get_max_pair(paris);
-        word_freq = merege_vocab(best,word_freq);
-        bpe_rank[best] = static_cast<int>(i);
 
-    }
-    // Step 1: Clean vocab and collect tokens
-    std::vector<std::string> tokens;
-    tokens.reserve(word_freq.size() + 4); // room for 4 special tokens
-    for (const auto& [word, freq] : word_freq) {
-        std::string temp = word;
-        remove_w_tag(temp);
-        tokens.push_back(temp);
+    // Add special tokens first
+    int next_id = 0;
+    for (const auto& tok : {pad_token, unk_token, start_token, end_token}) {
+        token_to_id[tok] = next_id;
+        id_to_token.push_back(tok);
+        if (tok == pad_token) pad_token_id = next_id;
+        else if (tok == unk_token) unk_token_id = next_id;
+        else if (tok == start_token) start_token_id = next_id;
+        else if (tok == end_token) end_token_id = next_id;
+        ++next_id;
     }
 
-    // Step 2: Add special tokens FIRST
-    std::vector<std::string> special_tokens = {
-        pad_token, unk_token, start_token, end_token
+    // Add initial character tokens
+    for (const auto& token : initial_tokens) {
+        if (!token_to_id.contains(token)) { // C++20 contains
+            token_to_id[token] = next_id;
+            id_to_token.push_back(token);
+            ++next_id;
+        }
+    }
+
+    // Build word frequencies and initial token lists
+    std::unordered_map<std::string, int> word_freq;
+    for (const auto& line : sentence_list) {
+        for (const auto& word : split_words(line)) {
+            word_freq[word]++;
+        }
+    }
+
+    struct Word {
+        std::vector<int> tokens;
+        int freq;
     };
-    int idx = 0;
-    for (const auto& tok : special_tokens) {
-        token_to_id[tok] = idx;
-        id_to_token[idx] = tok;
-        if (tok == pad_token) pad_token_id = idx;
-        else if (tok == unk_token) unk_token_id = idx;
-        else if (tok == start_token) start_token_id = idx;
-        else if (tok == end_token) end_token_id = idx;
-        ++idx;
+    std::vector<Word> words;
+    words.reserve(word_freq.size()); // Pre-allocate for efficiency
+    for (const auto& [word, freq] : word_freq) {
+        std::vector<int> tokens;
+        tokens.reserve(word.size() + 1);
+        for (char c : word) {
+            std::string s(1, c);
+            tokens.push_back(token_to_id.contains(s) ? token_to_id[s] : unk_token_id);
+        }
+        tokens.push_back(token_to_id["<w>"]);
+        words.push_back({std::move(tokens), freq});
     }
 
-    // Step 3: Add learned tokens
-    for (std::size_t i = 0; i < tokens.size(); ++i) {
-        token_to_id[tokens[i]] = static_cast<int>(i + idx);
-        id_to_token[static_cast<int>(i + idx)] = tokens[i];
-    }    
-    vocab = word_freq;
+    // Training loop
+    for (std::size_t i = 0; i < vocab_size; ++i) {
+        std::unordered_map<std::pair<int, int>, int, IntPairHash> pair_freq;
+        for (const auto& word : words) {
+            const auto& tokens = word.tokens;
+            for (size_t j = 0; j + 1 < tokens.size(); ++j) {
+                pair_freq[{tokens[j], tokens[j + 1]}] += word.freq;
+            }
+        }
 
+        if (pair_freq.empty()) break;
+        auto best_pair = std::max_element(pair_freq.begin(), pair_freq.end(),
+            [](const auto& a, const auto& b) { return a.second < b.second; })->first;
+
+        // Create new token
+        std::string new_token = id_to_token[best_pair.first] + id_to_token[best_pair.second];
+        int new_id = token_to_id.contains(new_token) ? token_to_id[new_token] : next_id++;
+        if (new_id == next_id - 1) {
+            token_to_id[new_token] = new_id;
+            id_to_token.push_back(new_token);
+        }
+
+        // Record merge
+        merge_map[best_pair] = new_id;
+        bpe_rank[best_pair] = i;
+
+        // Update words
+        for (auto& word : words) {
+            auto& tokens = word.tokens;
+            std::vector<int> new_tokens;
+            new_tokens.reserve(tokens.size());
+            size_t k = 0;
+            while (k < tokens.size()) {
+                if (k + 1 < tokens.size() && tokens[k] == best_pair.first && tokens[k + 1] == best_pair.second) {
+                    new_tokens.push_back(new_id);
+                    k += 2;
+                } else {
+                    new_tokens.push_back(tokens[k]);
+                    k++;
+                }
+            }
+            tokens = std::move(new_tokens);
+        }
+    }
+
+    // Populate vocab for compatibility (if needed by Python extension)
+    for (const auto& word : words) {
+        std::ostringstream oss;
+        for (size_t i = 0; i < word.tokens.size(); ++i) {
+            if (i > 0) oss << " ";
+            oss << id_to_token[word.tokens[i]];
+        }
+        vocab[oss.str()] = word.freq;
+    }
 }
-
-

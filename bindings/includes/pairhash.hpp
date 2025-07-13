@@ -4,10 +4,13 @@
 #include <string>
 #include <unordered_map>
 
-struct PairHash {
-    std::size_t operator()(const std::pair<std::string, std::string>& p) const {
-        return std::hash<std::string>()(p.first) ^ (std::hash<std::string>()(p.second) << 1);
+struct IntPairHash {
+    std::size_t operator()(const std::pair<int, int>& p) const {
+        auto h1 = std::hash<int>{}(p.first);
+        auto h2 = std::hash<int>{}(p.second);
+        return h1 ^ (h2 << 1); // Simple hash combination
     }
 };
+
 
 #endif // PAIRHASH_H

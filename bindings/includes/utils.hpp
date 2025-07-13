@@ -11,14 +11,6 @@ std::vector<std::string> split_words(const std::string& str);
 
 std::vector<std::string> split_char(const std::string& word);
 
-std::pair<std::string, std::string> get_max_pair(
-    const std::unordered_map<std::pair<std::string, std::string>, int, PairHash>& pairs
-);
-
-
-std::pair<std::string, std::string> get_min_pair(
-    const std::unordered_map<std::pair<std::string, std::string>, int, PairHash>& pairs
-);
 
 std::string join_tokens(const std::vector<std::string>& tokens);
 
