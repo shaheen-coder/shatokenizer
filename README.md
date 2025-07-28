@@ -1,4 +1,4 @@
-# ShaTokenizer 0.1.1
+# ShaTokenizer 0.1.2
 
 [![PyPI version](https://badge.fury.io/py/shatokenizer.svg)](https://badge.fury.io/py/shatokenizer)
 [![Python versions](https://img.shields.io/pypi/pyversions/shatokenizer.svg)](https://pypi.org/project/shatokenizer/)
@@ -81,7 +81,6 @@ You can visualize the performance improvements in the chart below:
 }
 })
 
-> 📊 Powered by [QuickChart.io](https://quickchart.io) for inline GitHub chart rendering.
 
 ---
 ## Installation

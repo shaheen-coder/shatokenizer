@@ -100,7 +100,7 @@ std::string ShaTokenizer::decode(const std::vector<int>& ids) {
     for (int id : ids) {
         if (id == pad_token_id || id == start_token_id || id == end_token_id) continue;
         if (id >= 0 && static_cast<size_t>(id) < id_to_token.size()) {
-            oss << id_to_token[id] << " ";
+            oss << remove_w_tag_r(id_to_token[id])<< " ";
         } else {
             oss << unk_token << " "; // fallback
         }

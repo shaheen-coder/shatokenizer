@@ -14,6 +14,6 @@ std::vector<std::string> split_char(const std::string& word);
 
 std::string join_tokens(const std::vector<std::string>& tokens);
 
-void remove_w_tag(std::string& str);
+std::string remove_w_tag_r(std::string str); // [1.1.2]
 
 #endif // UTILS_H

@@ -34,7 +34,7 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="shatokenizer",
-    version="0.1.1",
+    version="0.1.2",
     author="Shaheen Ahmed",
     author_email="shaheenvsa@gmail.com",
     description="High-performance bpe tokenizer with C++ backend and Python bindings",

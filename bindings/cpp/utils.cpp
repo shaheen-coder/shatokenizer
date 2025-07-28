@@ -34,12 +34,13 @@ std::string join_tokens(const std::vector<std::string>& tokens) {
     return oss.str();
 }
 
-
-void remove_w_tag(std::string& str) {
+// remove w tag in decode function [1.1.2]
+std::string remove_w_tag_r(std::string str) {
     const std::string from = "<w>";
     size_t pos = 0;
     while ((pos = str.find(from, pos)) != std::string::npos) {
         str.erase(pos, from.length()); 
     }
+    return str;
 }
 
