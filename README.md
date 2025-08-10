@@ -50,37 +50,8 @@ You can visualize the performance improvements in the chart below:
 
 #### Time Comparison (Lower is Better)
 
-!\[Tokenization Time Comparison]\([https://quickchart.io/chart?c={](https://quickchart.io/chart?c={)
-"type":"line",
-"data":{
-"labels":\["0","100","200","300","400","500","600","700","800","900"],
-"datasets":\[
-{
-"label":"v0.1.0",
-"data":\[84157,6977301,14437683,20902067,26554987,32350267,38075928,43831217,49559857,56149850],
-"borderColor":"#e74c3c",
-"fill"\:false
-},
-{
-"label":"v0.1.1",
-"data":\[5502,642335,1370924,2154547,2967434,3798688,4630268,5471428,6316320,7166352],
-"borderColor":"#2ecc71",
-"fill"\:false
-}
-]
-},
-"options":{
-"title":{
-"display"\:true,
-"text":"ShaTokenizer Tokenization Time Benchmark (µs)"
-},
-"scales":{
-"yAxes":\[{"scaleLabel":{"display"\:true,"labelString":"Time (µs)"}}],
-"xAxes":\[{"scaleLabel":{"display"\:true,"labelString":"Tokens Processed"}}]
-}
-}
-})
 
+![Tokenization Time Comparison](https://quickchart.io/chart?c=%7B%22type%22%3A%22line%22%2C%22data%22%3A%7B%22labels%22%3A%5B%220%22%2C%22100%22%2C%22200%22%2C%22300%22%2C%22400%22%2C%22500%22%2C%22600%22%2C%22700%22%2C%22800%22%2C%22900%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22v0.1.0%22%2C%22data%22%3A%5B84157%2C6977301%2C14437683%2C20902067%2C26554987%2C32350267%2C38075928%2C43831217%2C49559857%2C56149850%5D%2C%22borderColor%22%3A%22%23e74c3c%22%2C%22fill%22%3Afalse%7D%2C%7B%22label%22%3A%22v0.1.1%22%2C%22data%22%3A%5B5502%2C642335%2C1370924%2C2154547%2C2967434%2C3798688%2C4630268%2C5471428%2C6316320%2C7166352%5D%2C%22borderColor%22%3A%22%232ecc71%22%2C%22fill%22%3Afalse%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22ShaTokenizer%20Tokenization%20Time%20Benchmark%20(%C2%B5s)%22%7D%2C%22scales%22%3A%7B%22yAxes%22%3A%5B%7B%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Time%20(%C2%B5s)%22%7D%7D%5D%2C%22xAxes%22%3A%5B%7B%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Tokens%20Processed%22%7D%7D%5D%7D%7D%7D)
 
 ---
 ## Installation
